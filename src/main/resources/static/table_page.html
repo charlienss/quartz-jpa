@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../static/css/layui.css" media="all">
+
+
+    <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
+    <script src="../static/jquery-3.1.1/jquery-3.1.1.js"></script>
+    <script src="../static/layui.js"></script>
+
+    <style>
+        .layui-form-item {
+            margin-top: 10px;
+            width: 80%;
+            margin-bottom: 15px;
+            clear: both;
+            *zoom: 1
+        }
+    </style>
+
+</head>
+<body>
+<!--<button id="ceshi">测试</button>-->
+
+<table class="layui-hide" id="test"></table>
+
+<script type="text/html" id="switchTpl">
+    <!-- 这里的 checked 的状态只是演示 -->
+    <input type="checkbox" name="start" value="{{d.id}}" lay-skin="switch" lay-text="开启|关闭" lay-filter="checkStart" {{ d.status=='OPEN'
+           ? 'checked' : '' }}>
+</script>
+
+<!--<script type="text/html" id="checkboxTpl">-->
+<!--&lt;!&ndash; 这里的 checked 的状态只是演示 &ndash;&gt;-->
+<!--<input type="checkbox" name="lock" value="{{d.id}}" title="锁定" lay-filter="lockDemo" {{ d.id == 10006 ? 'checked' : '' }}>-->
+<!--</script>-->
+<form id="myForm" action="http://localhost:9090/data/addJob" method="post" class="layui-form" style="display: none;">
+    <div class="layui-form-item" style="display: none">
+        <label class="layui-form-label">id</label>
+        <div class="layui-input-block">
+            <input type="hidden" name="id" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">name</label>
+        <div class="layui-input-block">
+            <input type="text" name="name" required lay-verify="required" placeholder="请输入名字" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">group</label>
+        <div class="layui-input-block">
+            <input type="text" name="group" required lay-verify="required" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">cron</label>
+        <div class="layui-input-block">
+            <input type="text" name="cron" required lay-verify="required" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">parameter</label>
+        <div class="layui-input-block">
+            <input type="text" name="parameter" required lay-verify="required" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">description</label>
+        <div class="layui-input-block">
+            <input type="text" name="description" required lay-verify="required" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">parameter</label>
+        <div class="layui-input-block">
+            <input type="text" name="parameter" required lay-verify="required" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">vmParam</label>
+        <div class="layui-input-block">
+            <input type="text" name="vmParam" required lay-verify="required" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">jarPath</label>
+        <div class="layui-input-block">
+            <input type="text" name="jarPath" required lay-verify="required" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">status</label>
+        <div class="layui-input-block">
+            <select name="status" lay-verify="required">
+                <option value="OPEN">开启</option>
+                <option value="CLOSE">关闭</option>
+            </select>
+        </div>
+    </div>
+    <br/>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <input class="layui-btn" type="submit" value="立即提交" lay-submit lay-filter="formDemo">
+            <button type="button" class="layui-btn layui-btn-primary cacleBtn">取消</button>
+        </div>
+    </div>
+
+</form>
+
+<form id="updForm" action="http://localhost:9090/data/updData" method="post" class="layui-form" style="display: none;">
+    <div class="layui-form-item" style="display: none">
+        <label class="layui-form-label">id</label>
+        <div class="layui-input-block">
+            <input type="hidden" name="id" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">name</label>
+        <div class="layui-input-block">
+            <input type="text" name="name" required lay-verify="required" placeholder="请输入名字" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">group</label>
+        <div class="layui-input-block">
+            <input type="text" name="group" required lay-verify="required" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">cron</label>
+        <div class="layui-input-block">
+            <input type="text" name="cron" required lay-verify="required" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">parameter</label>
+        <div class="layui-input-block">
+            <input type="text" name="parameter" required lay-verify="required" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">description</label>
+        <div class="layui-input-block">
+            <input type="text" name="description" required lay-verify="required" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">parameter</label>
+        <div class="layui-input-block">
+            <input type="text" name="parameter" required lay-verify="required" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">vmParam</label>
+        <div class="layui-input-block">
+            <input type="text" name="vmParam" required lay-verify="required" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">jarPath</label>
+        <div class="layui-input-block">
+            <input type="text" name="jarPath" required lay-verify="required" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">status</label>
+        <div class="layui-input-block">
+            <select name="status" lay-verify="required">
+                <option value="OPEN">开启</option>
+                <option value="CLOSE">关闭</option>
+            </select>
+        </div>
+    </div>
+
+    <br/>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <input class="layui-btn" type="submit" value="立即提交" lay-submit lay-filter="formDemo">
+            <button type="button" class="layui-btn layui-btn-primary cacleBtn">取消</button>
+        </div>
+    </div>
+
+</form>
+
+
+<script>
+
+    /**
+     * 分页的实现
+     */
+    layui.use('table', function () {
+        var table = layui.table
+            , form = layui.form;
+
+        table.render({
+            elem: '#test'
+            , url: 'http://localhost:9090/data/jobList'
+            , cellMinWidth: 80
+            , cols: [[
+                {field: 'id', title: 'ID', unresize: true, sort: true}
+                , {field: 'name', title: '名称'}
+                , {field: 'group', title: '组别'}
+                , {field: 'cron', title: '核心表达式'}
+                , {field: 'parameter', title: '参数'}
+                , {field: 'description', title: '参数描述'}
+                , {field: 'vm_param', title: 'VM参数'}
+                , {field: 'jarPath', title: 'jar包路径'}
+                , {field: 'status', title: '是否开启编译jar包', templet: '#switchTpl', unresize: true}
+                , {field: 'wealth', title: '操作', templet: '#barDemo'}
+            ]]
+            , page: true
+            , response: {
+                statusCode: 200 //重新规定成功的状态码为 200，table 组件默认为 0
+            }
+
+        });
+
+        //监听开启操作
+        form.on('switch(checkStart)', function (obj) {
+            console.log("开启与否:" + obj.elem.checked + "id:" + this.value);
+            var start = obj.elem.checked;
+            var id = this.value;
+
+            // 这里将相关的状态去请求
+            $.ajax({
+                type: 'get',
+                url: 'http://localhost:9090/data/updStatus?start=' + start + "&id=" + id,
+                data: '',
+                success: function (result) {
+                    var text = "";
+                    if (result == "OPEN") {
+                        text = "开启成功";
+                        var $_start = layer.msg('已开启', {icon: 1});
+                        setTimeout(function () {
+                            layer.close($_start);
+                        }, 500)
+                    } else {
+                        var $_end = layer.msg('已关闭', {icon: 2});
+                        setTimeout(function () {
+                            layer.close($_end);
+                        }, 500)
+                    }
+                    console.log(result);
+                }
+            })
+//            layer.tips(this.value + ' ' + this.name + '：' + obj.elem.checked, obj.othis);
+        });
+    });
+</script>
+
+<script type="text/html" id="barDemo">
+    <a class="add_obj layui-btn layui-btn-primary layui-btn-xs" lay-event="detail" onclick="addJob()">增加</a>
+    <a class="layui-btn layui-btn-xs" lay-event="edit" onclick="updJob('{{d.id}}')">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" onclick="delJob('{{d.id}}')">删除</a>
+</script>
+
+
+<!--这里是表单的crud的内容-->
+<script>
+    var $_content = $('#myForm');
+    var upd_content = $('#updForm');
+    //Demo
+    layui.use('form', function () {
+        var form = layui.form;
+        //监听提交
+        form.on('submit(formDemo)', function () {
+            window.location.reload();
+            window.parent.location.reload();
+        });
+    });
+
+
+    var index = layer.open({
+        type: 1,
+        skin: 'layui-layer-demo', //样式类名
+        closeBtn: 1, //不显示关闭按钮
+        area: ["500px"],
+        title: "新增的内容",
+        anim: 2,
+        shadeClose: true, //开启遮罩关闭
+        content: $_content,
+    });
+
+    /**
+     * 增加
+     */
+    function addJob(id) {
+        $('#myForm input').val("");
+
+        $("#myForm input[type='submit']").val("立即提交");
+        //自定页
+        var open = layer.open({
+            type: 1,
+            skin: 'layui-layer-demo', //样式类名
+            closeBtn: 1, //不显示关闭按钮
+            area: ["500px"],
+            title: "新增的内容",
+            anim: 2,
+            shadeClose: true, //开启遮罩关闭
+            content: $_content
+
+        });
+
+
+        $('.cacleBtn').click(function () {
+            layer.close(index);
+        })
+    }
+
+    /**
+     * 编辑
+     */
+    function updJob(index) {
+
+        console.log(index);
+        //请求此id的对应数据 填充到表单中
+        $.ajax({
+            type: "get",
+            url: 'http://localhost:9090/data/getUpdData?id=' + index,
+            data: "",
+            success: function (result) {
+                console.log(result);
+                //填充数据
+                $("input[name='id']").attr("value", result.id);
+                $("input[name='name']").attr("value", result.name);
+                $("input[name='group']").attr("value", result.group);
+                $("input[name='cron']").attr("value", result.cron);
+                $("input[name='parameter']").attr("value", result.parameter);
+                $("input[name='vmParam']").attr("value", result.vmParam);
+                $("input[name='jarPath']").attr("value", result.jarPath);
+                $("input[name='status']").attr("value", result.status);
+                var status = result.status;
+                $("option[value=" + status + "]").attr("selected", "selected");
+            }
+        })
+
+        var index = layer.open({
+            type: 1,
+            skin: 'layui-layer-demo', //样式类名
+            closeBtn: 1, //不显示关闭按钮
+            area: ["500px"],
+            title: "新增的内容",
+            anim: 2,
+            shadeClose: true, //开启遮罩关闭
+            content: upd_content,
+        });
+        //先修改action
+//        $('#myForm').attr("action", "http://localhost:9090/data/updData");
+
+        $('.cacleBtn').click(function () {
+            layer.close(index);
+        })
+    }
+
+    /**
+     * 删除
+     */
+    function delJob(index) {
+        var isSure = confirm("您确定要删除这条数据吗?")
+        if (isSure) {
+            $.ajax({
+                type: "get",
+                url: 'http://localhost:9090/data/delJob?id=' + index,
+                data: "",
+                success: function () {
+                    var $_end = layer.msg('已删除', {icon: 1});
+                    setTimeout(function () {
+                        layer.close($_end);
+                        window.location.reload();
+                    }, 500)
+                }
+            })
+        }
+    }
+
+</script>
+
+</body>
+</html>

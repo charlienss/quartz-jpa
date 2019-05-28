@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- status : 指定log4j本身的打印日志的级别.ALL< Trace < DEBUG < INFO < WARN < ERROR < FATAL < OFF。
+	 monitorInterval : 用于指定log4j自动重新配置的监测间隔时间，单位是s,最小是5s. -->
+<Configuration status="INFO" monitorInterval="30">
+
+    <Properties>
+        <!-- 配置日志文件输出目录 ${sys:user.home} -->
+        <Property name="LOG_HOME">/www/datain/log/datain-agent/</Property>
+        <property name="INFO_LOG_FILE_NAME">/www/datain/log/datain-agent/datain-agent-info.log</property>
+        <property name="ERROR_LOG_FILE_NAME">/www/datain/log/datain-agent/datain-agent-error.log</property>
+        <!-- 输出日志的格式
+                %d{yyyy-MM-dd HH:mm:ss, SSS} : 日志生产时间
+                %p : 日志输出格式
+                %c : logger的名称
+                %m : 日志内容，即 logger.info("message")
+                %n : 换行符
+                %C : Java类名
+                %L : 日志输出所在行数
+                %M : 日志输出所在方法名
+                hostName : 本地机器名
+                hostAddress : 本地ip地址
+            	%d{yyyy-MM-dd HH:mm:ss.SSS} [%t-%L] [%c] %-5level %logger{36} - %msg%n
+            	%d %-5p [%t] [%c] - %m%n
+            	 -->
+        <property name="PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p [%t-%L] [%c] - %m%n</property>
+    </Properties>
+    <Appenders>
+        <!-- 控制台输出 -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <!-- 控制台只输出level及以上级别的信息(onMatch),其他的直接拒绝(onMismatch) -->
+            <ThresholdFilter level="trace" onMatch="ACCEPT" onMismatch="DENY" />
+            <!-- 输出日志的格式 -->
+            <PatternLayout pattern="${PATTERN}" />
+        </Console>
+        <!--
+        	以下配置规则说明:			打印出所有的info及以下级别的信息，每次大小超过size， 则这size大小的日志会自动存入按年份-月份建立的文件夹下面.
+        								如果需要进行压缩,则在 filePattern 属性文件名最后增加 .gz 即可
+
+        	RollingRandomAccessFile 	按时间和文件大小滚动,相比RollingFileAppender有很大的性能提升,官网宣称是20-200%
+        								日志文件写入策略为异步刷盘，引出一个缓冲区（buffer）的概念，RollingRandomAccessFile 会将日志信息先写入到缓冲区,
+        								然后缓冲区满后刷到磁盘，并清空缓冲区，默认缓冲区的大小在8-256kb，具体大小需要自己设置
+
+        	fileName					当前日志文件名
+
+        	filePattern					日志滚动时文件的重命名规则,
+        								按天分日志文件 : market-server-%d{yyyy-MM-dd}-%i.log
+        								按分钟分日志文件 : market-server-%d{yyyy-MM-dd-HH-mm}-%i.log
+
+        	immediateFlush 				日志写入策略  true 写入时立即刷新 日志文件、false 缓冲区满后写入日志文件, 注：经测试验证 先写缓冲区 性能要优于 立即写入文件
+
+        	TimeBasedTriggeringPolicy	基于时间的滚动策略,interval属性用来指定多久滚动一次,默认是1 hour. modulate=true用来调整时间：比如现在是早上3am,interval是4,
+        								那么第一次滚动是在4am，接着是8am，12am...而不是7am.
+        								此配置需要和 filePattern 结合使用, interval 参数精确的单位取决于 filePattern 属性的日期格式精确到哪一位,
+        								如 filePattern 中配置的文件命名规则是: %d{yyyy-MM-dd}-%i.log 最小时间粒度是天结合起来就是每一天生成一个新文件。
+        								如果改成%d{yyyy-MM-dd HH}，最小粒度为小时,则每一个小时生成一个文件
+
+        	SizeBasedTriggeringPolicy	基于指定文件大小的滚动策略，size属性用来定义每个日志文件的大小.
+
+        	DefaultRolloverStrategy		同一文件夹下最多存储日志文件的数量, 默认7个
+         -->
+        <RollingRandomAccessFile name="infoLog" fileName="${INFO_LOG_FILE_NAME}"
+                                 filePattern="${LOG_HOME}/$${date:yyyy-MM}/agent-info-%d{yyyy-MM-dd}-%i.log" immediateFlush="false" >
+
+            <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout>
+                <Charset>UTF-8</Charset>
+                <Pattern>${PATTERN}</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+                <!-- <SizeBasedTriggeringPolicy size="2KB" />  -->
+                <!-- <SizeBasedTriggeringPolicy size="10MB" /> -->
+            </Policies>
+            <DefaultRolloverStrategy max="100" />
+        </RollingRandomAccessFile>
+
+        <RollingRandomAccessFile name="errorLog" fileName="${ERROR_LOG_FILE_NAME}"
+                                 filePattern="${LOG_HOME}/$${date:yyyy-MM}/agent-error-%d{yyyy-MM-dd}-%i.log" immediateFlush="false" >
+            <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout>
+                <Charset>UTF-8</Charset>
+                <Pattern>${PATTERN}</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+            </Policies>
+            <DefaultRolloverStrategy max="100" />
+        </RollingRandomAccessFile>
+    </Appenders>
+
+    <!-- 异步和非异步混合输出模式 -->
+    <Loggers>
+
+        <!--同步异步混合使用<AsyncLogger> or <asyncRoot> 配置元素后就不需要配置 "Log4jContextSelector" 系统属性。
+             additivity=false 表示在该logger中输出的日志不会再延伸到父层logger。这里如果改为true，则会延伸到Root Logger，遵循Root Logger的配置也输出一次
+             name="com.example.pkgname OR com.example.pkgname.ClassName"
+        -->
+        <!-- <AsyncLogger name="com.game.core.framework.websocket.handler.SpringWebSocketHandler" level="INFO" includeLocation="true" additivity="false">
+            <appender-ref ref="infoLog" />
+        </AsyncLogger> -->
+
+        <root level="info" includeLocation="true">
+            <appender-ref ref="errorLog" />
+            <appender-ref ref="infoLog" />
+            <appender-ref ref="Console"/>
+        </root>
+
+        <!--过滤掉spring和mybatis的一些无用的DEBUG信息-->
+        <logger name="org.springframework" level="INFO"/>
+        <logger name="org.mybatis" level="INFO"/>
+
+        <!-- 第三方日志系统 -->
+        <logger name="org.springframework.core" level="INFO" />
+        <logger name="org.springframework.beans" level="INFO" />
+        <logger name="org.springframework.context" level="INFO" />
+        <logger name="org.springframework.web" level="INFO" />
+        <logger name="org.apache.http" level="WARN" />
+        <logger name="com.meizu.kiev" level="ERROR" />
+        
+    </Loggers>
+
+</Configuration>
